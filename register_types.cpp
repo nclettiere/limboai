@@ -128,6 +128,7 @@
 using namespace godot;
 #endif // LIMBOAI_GDEXTENSION
 
+static LimboTaskDB *_limbo_task_db = nullptr;
 static LimboUtility *_limbo_utility = nullptr;
 
 void initialize_limboai_module(ModuleInitializationLevel p_level) {
@@ -141,6 +142,7 @@ void initialize_limboai_module(ModuleInitializationLevel p_level) {
 #endif
 		LimboDebugger::initialize();
 
+		GDREGISTER_CLASS(LimboTaskDB);
 		GDREGISTER_CLASS(LimboUtility);
 		GDREGISTER_CLASS(Blackboard);
 		GDREGISTER_CLASS(BlackboardPlan);
@@ -238,11 +240,14 @@ void initialize_limboai_module(ModuleInitializationLevel p_level) {
 		GDREGISTER_CLASS(BBVector4);
 		GDREGISTER_CLASS(BBVector4i);
 
+		_limbo_task_db = memnew(LimboTaskDB);
 		_limbo_utility = memnew(LimboUtility);
 
 #ifdef LIMBOAI_MODULE
+		Engine::get_singleton()->add_singleton(Engine::Singleton("LimboTaskDB", LimboTaskDB::get_singleton()));
 		Engine::get_singleton()->add_singleton(Engine::Singleton("LimboUtility", LimboUtility::get_singleton()));
 #elif LIMBOAI_GDEXTENSION
+		Engine::get_singleton()->register_singleton("LimboTaskDB", LimboTaskDB::get_singleton());
 		Engine::get_singleton()->register_singleton("LimboUtility", LimboUtility::get_singleton());
 #endif
 
@@ -288,6 +293,7 @@ void uninitialize_limboai_module(ModuleInitializationLevel p_level) {
 	if (p_level == MODULE_INITIALIZATION_LEVEL_SCENE) {
 		LimboDebugger::deinitialize();
 		LimboStringNames::free();
+		memdelete(_limbo_task_db);
 		memdelete(_limbo_utility);
 	}
 }
