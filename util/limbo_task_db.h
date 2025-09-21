@@ -14,6 +14,7 @@
 
 #ifdef LIMBOAI_MODULE
 #include "core/object/class_db.h"
+#include "core/object/object.h"
 #include "core/templates/hash_map.h"
 #include "core/templates/list.h"
 #endif // LIMBOAI_MODULE
@@ -26,7 +27,8 @@
 using namespace godot;
 #endif // LIMBOAI_GDEXTENSION
 
-class LimboTaskDB {
+class LimboTaskDB : public Object {
+	GDCLASS(LimboTaskDB, Object);
 private:
 	static HashMap<String, List<String>> core_tasks;
 	static HashMap<String, List<String>> tasks_cache;
@@ -37,7 +39,15 @@ private:
 		}
 	};
 
+protected:
+	static LimboTaskDB *singleton;
+	static void _bind_methods();
+
 public:
+	static LimboTaskDB *get_singleton();
+	
+	void register_task_api(String p_class_name, String p_task_category);
+	
 	template <class T>
 	static void register_task() {
 		GDREGISTER_CLASS(T);
@@ -62,6 +72,9 @@ public:
 			return p_class_or_script_path.trim_prefix("BT");
 		}
 	}
+	
+	LimboTaskDB();
+	~LimboTaskDB();
 };
 
 #ifdef LIMBOAI_MODULE

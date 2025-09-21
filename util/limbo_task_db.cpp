@@ -23,8 +23,20 @@
 using namespace godot;
 #endif // LIMBOAI_GDEXTENSION
 
+LimboTaskDB *LimboTaskDB::singleton = nullptr;
+
 HashMap<String, List<String>> LimboTaskDB::core_tasks;
 HashMap<String, List<String>> LimboTaskDB::tasks_cache;
+
+
+LimboTaskDB *LimboTaskDB::get_singleton() {
+	return singleton;
+}
+
+void LimboTaskDB::_bind_methods() {
+	ClassDB::bind_method(D_METHOD("register_task_api", "p_class_name", "p_task_category"), &LimboTaskDB::register_task_api);
+}
+
 
 _FORCE_INLINE_ void _populate_scripted_tasks_from_dir(String p_path, List<String> *p_task_classes) {
 	if (p_path.is_empty()) {
@@ -115,4 +127,24 @@ List<String> LimboTaskDB::get_categories() {
 
 List<String> LimboTaskDB::get_tasks_in_category(const String &p_category) {
 	return List<String>(tasks_cache[p_category]);
+}
+
+void LimboTaskDB::register_task_api(String p_class_name, String p_task_category)
+{
+	HashMap<String, List<String>>::Iterator E = core_tasks.find(p_class_name);
+	if (E) {
+		E->value.push_back(p_class_name);
+	} else {
+		List<String> tasks;
+		tasks.push_back(p_class_name);
+		core_tasks.insert(p_task_category, tasks);
+	}
+}		
+
+LimboTaskDB::LimboTaskDB() {
+	singleton = this;
+}
+
+LimboTaskDB::~LimboTaskDB() {
+	singleton = nullptr;
 }
