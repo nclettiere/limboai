@@ -131,7 +131,7 @@ List<String> LimboTaskDB::get_tasks_in_category(const String &p_category) {
 
 void LimboTaskDB::register_task_api(String p_class_name, String p_task_category)
 {
-	HashMap<String, List<String>>::Iterator E = core_tasks.find(p_class_name);
+	HashMap<String, List<String>>::Iterator E = core_tasks.find(p_task_category);
 	if (E) {
 		E->value.push_back(p_class_name);
 	} else {
